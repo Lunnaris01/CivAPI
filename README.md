@@ -1,4 +1,7 @@
 # Civ_API
+![CI](https://github.com/Lunnaris01/Civ_API/actions/workflows/ci.yml/badge.svg)
+
+
 Project implementing an API for Data for Civilisation 6 which is gathered by users!
 
 Initial Goals:
