@@ -1,4 +1,4 @@
-# Civ_API
+# CivAPI
 ![CI](https://github.com/Lunnaris01/Civ_API/actions/workflows/ci.yml/badge.svg)
 
 
