@@ -4,46 +4,75 @@ package main
 import(
 	"fmt"
 	"os"
-	"github.com/joho/godotenv"
+	"log"
 	"database/sql"
+	"net/http"
+
+
+	"github.com/Lunnaris01/CivAPI/internal/database"
+
+	"github.com/joho/godotenv"
 	_ "github.com/tursodatabase/libsql-client-go/libsql"
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
+
 
 )
 
 
 
 type apiConfig struct {
-	//dbQueries *database.Queries
-	dbURL string
-	dbToken string
+	db *database.Queries
 	platform string
+	port string
 }
 
 func main(){
 	fmt.Println("Civ API started!")
-	godotenv.Load()
+	err := godotenv.Load(".env")
+	if err != nil {
+		log.Fatalf("Failed to load necessary environment variables with err: %v",err)
+	}
 
 	env_platform := os.Getenv("PLATFORM")
 	env_dbURL := os.Getenv("TURSO_DATABASE_URL")
 	env_dbToken := os.Getenv("TURSO_AUTH_TOKEN")
+	env_port := os.Getenv("PORT")
 	dbCombinedURL := env_dbURL + "?authToken=" + env_dbToken
-	db, err := sql.Open("libsql", dbCombinedURL)
+	log.Printf("Connecting to db at %s,", env_dbURL)
 
-	if err != nil {
-	  fmt.Fprintf(os.Stderr, "failed to open db %s: %s", dbCombinedURL, err)
-	  os.Exit(1)
+	sqlitedb, err := sql.Open("libsql", dbCombinedURL)
+	if err != nil{
+		log.Fatalf("Failed to connect to database with err: %v\n", err)
 	}
+	defer sqlitedb.Close()
 
+	dbQueries := database.InitDB(dbCombinedURL)
 
-	defer db.Close()
-  
+	log.Println("Database connection successful!")
 
 	apiCfg := apiConfig {
-		dbURL: env_dbURL,
-		dbToken: env_dbToken,
+		db: dbQueries,
 		platform: env_platform,
+		port: env_port,
 	}
+
+
+	router := chi.NewRouter()
+	router.Use(middleware.Logger)
+
+	router.Get("/", apiCfg.handlerIndex)
+
+	log.Printf("Server running and waiting for requests\n")
+	http.ListenAndServe(":" + apiCfg.port, router)
+
 
 	fmt.Println(apiCfg)
 
+}
+
+
+
+func (cfg apiConfig) handlerIndex(w http.ResponseWriter, r *http.Request){
+	w.Write([]byte("Hello World"))
 }
