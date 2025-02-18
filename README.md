@@ -1,15 +1,23 @@
 # CivAPI
 ![CI](https://github.com/Lunnaris01/Civ_API/actions/workflows/ci.yml/badge.svg)
 
+CivAPI is designed to allow users to make entrys for the Civ games they played and to get statistical insight.
 
-Project implementing an API for Data for Civilisation 6 which is gathered by users!
+(Upcoming) Features:
+- Usermanagement
+- Friendgroups
+- Save your game stats
+- Calculate individual stats (winrate, rate per leader, average round to win, most common wincondition, ...)
+- See accumulated stats for friendgroups
+- ...
 
-Initial Goals:
-Code a solid backend
-CI using Github Actions
-Good Test Coverage
+Project Goals:
+Code a stable and secure backend using GO and raw SQL (sqlite) instead of sqlc
+Create a simple and light weight frontend for User Interaction.
+CI using Github Actions for Testing, Stylechecks/linting, ...
+Remote Database using Turso
 
-Long Term Goal:
-Add Frontend
-CD using google cloud.
-Start gathering data from certified users.
+Optional Long Term Goals:
+CD using docker+gcloud.
+Improve Frontend to have great looking visualization for the statistics.
+
