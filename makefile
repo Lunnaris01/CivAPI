@@ -1,7 +1,7 @@
 .PHONY: run build
 
 run:
-	go run ./cmd/CivAPI
+	go run .
 
 build:
-	go build -o civapi ./cmd/CivAPI
+	go build -o civapi .
