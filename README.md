@@ -4,7 +4,7 @@
 A lightweight REST API + Frontend to get Insights into your Civilisation VI data!
 Technologies:
 - Programming Language: GO
-- Database: sqlite (Turso)
+- Database and Database Migration: sqlite (Turso) and goose
 - Router: [Chi](https://github.com/go-chi/chi/tree/master)
 - CI using Github Actions
 - CD using docker and gcloud
