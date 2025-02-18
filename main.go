@@ -94,7 +94,7 @@ func (cfg apiConfig) handlerStatic(w http.ResponseWriter, r *http.Request){
     filepath := r.URL.Path
 	log.Printf("Requested path: %s", filepath)
 	if filepath == "/" {
-        filepath = "/static/index.html"
+        filepath = "/static/html/index.html"
     } else if !strings.HasPrefix(filepath, "/static/") {
         filepath = "/static" + filepath
     }
