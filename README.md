@@ -1,7 +1,13 @@
 # CivAPI
 ![CI](https://github.com/Lunnaris01/Civ_API/actions/workflows/ci.yml/badge.svg)
 
-CivAPI is designed to allow users to make entrys for the Civ games they played and to get statistical insight.
+A lightweight REST API + Frontend to get Insights into your Civ VI data!
+Technologies:
+- Programming Language: GO
+- Database: sqlite (Turso)
+- Router: [Chi](https://github.com/go-chi/chi/tree/master)
+- CI using Github Actions
+- CD using docker and gcloud
 
 (Upcoming) Features:
 - Usermanagement
