@@ -11,7 +11,7 @@ import (
 	"path"
 	"strings"
 
-	"github.com/Lunnaris01/CivAPI/internal/auth"
+	//"github.com/Lunnaris01/CivAPI/internal/auth"
 	"github.com/Lunnaris01/CivAPI/internal/database"
 
 	"github.com/go-chi/chi/v5"
@@ -100,6 +100,8 @@ func (cfg apiConfig) displayFileserverContent(w http.ResponseWriter, filepath st
 			filepath = "/static/css" + filepath
 		} else if ext == ".html" {
 			filepath = "/static/html" + filepath
+		} else if ext == ".ico" {
+			filepath = "/static/images" + filepath
 		} else {
 			filepath = "/static/html" + filepath + ".html"
 		}
@@ -120,33 +122,5 @@ func (cfg apiConfig) displayFileserverContent(w http.ResponseWriter, filepath st
 		log.Printf("Error copying file to response: %v", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
-
-}
-
-func (cfg apiConfig) handlerLogin(w http.ResponseWriter, r *http.Request) {
-
-	// auth user
-	cfg.displayFileserverContent(w, "/login")
-
-}
-
-func (cfg apiConfig) handlerSignup(w http.ResponseWriter, r *http.Request) {
-	username := r.FormValue("username")
-	password := r.FormValue("password")
-	hashed_password, err := auth.HashPassword(password)
-	if err != nil {
-		log.Printf("Error hashin password: %v", err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	err = cfg.db.AddUser(r.Context(), username, hashed_password)
-	if err != nil {
-		log.Printf("Error creating user: %v", err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	log.Printf("Successfully added user")
-	cfg.displayFileserverContent(w, "/login")
 
 }
