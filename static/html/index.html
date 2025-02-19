@@ -27,9 +27,34 @@
 </body>
 
 <script>
-    function setAction(actionUrl) {
-        document.getElementById('loginForm').action = actionUrl;
-    }
+    document.getElementById("loginForm").addEventListener("submit", async function(event) {
+        event.preventDefault(); // Prevent default form submission
+
+        const form = event.target;
+        const formData = new FormData(form);
+        const actionUrl = form.getAttribute("action");
+
+        try {
+            const response = await fetch(actionUrl, {
+                method: "POST",
+                body: formData
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                // Save token to localStorage
+                localStorage.setItem("accessToken", data.Token);
+                alert("Login successful!");
+                window.location.href = "/dashboard"; // Redirect to dashboard or another page
+            } else {
+                alert("Login failed: " + data.message);
+            }
+        } catch (error) {
+            console.error("Error during login:", error);
+            alert("An error occurred. Please try again.");
+        }
+    });
 </script>
 
 </html>

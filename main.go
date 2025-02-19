@@ -38,6 +38,7 @@ type apiConfig struct {
 	db       *database.Queries
 	platform string
 	port     string
+	secretKey string
 }
 
 func main() {
@@ -51,6 +52,7 @@ func main() {
 	env_dbURL := os.Getenv("TURSO_DATABASE_BASE")
 	env_dbToken := os.Getenv("TURSO_AUTH_TOKEN")
 	env_port := os.Getenv("PORT")
+	evn_secret := os.Getenv("SECRET_KEY")
 	dbCombinedURL := env_dbURL + "?authToken=" + env_dbToken
 	log.Printf("Connecting to db at %s,", env_dbURL)
 
@@ -65,9 +67,10 @@ func main() {
 	log.Println("Database connection successful!")
 
 	apiCfg := apiConfig{
-		db:       dbQueries,
-		platform: env_platform,
-		port:     env_port,
+		db:       	dbQueries,
+		platform: 	env_platform,
+		port:     	env_port,
+		secretKey:	evn_secret,
 	}
 
 	router := chi.NewRouter()

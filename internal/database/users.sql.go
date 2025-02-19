@@ -14,6 +14,7 @@ import (
     username TEXT NOT NULL UNIQUE,
     hashed_password TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     is_contributer BOOLEAN NOT NULL DEFAULT false
 
 */
@@ -23,6 +24,7 @@ type User struct {
 	Username string
 	HashedPassword string
 	CreatedAt time.Time
+	UpdatedAt time.Time
 	IsContributer bool
 }
 
@@ -58,7 +60,7 @@ func (q *Queries) GetUserByUsername(ctx context.Context, username string) (User,
 	defer stmt.Close() // Ensure the statement is closed after use
 	// Execute the statement with the provided parameters
 	var user User
-	err = stmt.QueryRowContext(ctx, username).Scan(&user.ID,&user.Username,&user.HashedPassword,&user.CreatedAt,&user.IsContributer)
+	err = stmt.QueryRowContext(ctx, username).Scan(&user.ID,&user.Username,&user.HashedPassword,&user.CreatedAt,&user.UpdatedAt,&user.IsContributer)
 	if err != nil {
 		return User{},fmt.Errorf("failed to fetch User from Database: %w", err)
 	}
