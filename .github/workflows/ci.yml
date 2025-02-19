@@ -19,7 +19,7 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: "1.23.5"
-      # Check if Program finishes.
+      # For now only check if the program builds.
       - name: Run Tests
         run: go build -o CivAPI .
 

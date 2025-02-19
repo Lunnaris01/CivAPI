@@ -11,6 +11,7 @@ import (
 	"path"
 	"strings"
 
+	"github.com/Lunnaris01/CivAPI/internal/auth"
 	"github.com/Lunnaris01/CivAPI/internal/database"
 
 	"github.com/go-chi/chi/v5"
@@ -47,7 +48,7 @@ func main() {
 	}
 
 	env_platform := os.Getenv("PLATFORM")
-	env_dbURL := os.Getenv("TURSO_DATABASE_URL")
+	env_dbURL := os.Getenv("TURSO_DATABASE_BASE")
 	env_dbToken := os.Getenv("TURSO_AUTH_TOKEN")
 	env_port := os.Getenv("PORT")
 	dbCombinedURL := env_dbURL + "?authToken=" + env_dbToken
@@ -73,6 +74,8 @@ func main() {
 	router.Use(middleware.Logger)
 
 	router.Get("/*", apiCfg.handlerStatic)
+	router.Post("/login", apiCfg.handlerLogin)
+	router.Post("/signup", apiCfg.handlerSignup)
 
 	log.Printf("Server running and waiting for requests on port %v\n", apiCfg.port)
 	http.ListenAndServe(":"+apiCfg.port, router)
@@ -83,11 +86,23 @@ func main() {
 
 func (cfg apiConfig) handlerStatic(w http.ResponseWriter, r *http.Request) {
 	filepath := r.URL.Path
+	cfg.displayFileserverContent(w, filepath)
+}
+
+func (cfg apiConfig) displayFileserverContent(w http.ResponseWriter, filepath string) {
 	log.Printf("Requested path: %s", filepath)
+	var ext string
 	if filepath == "/" {
 		filepath = "/static/html/index.html"
 	} else if !strings.HasPrefix(filepath, "/static/") {
-		filepath = "/static" + filepath
+		ext = strings.ToLower(path.Ext(filepath))
+		if ext == ".css" {
+			filepath = "/static/css" + filepath
+		} else if ext == ".html" {
+			filepath = "/static/html" + filepath
+		} else {
+			filepath = "/static/html" + filepath + ".html"
+		}
 	}
 	log.Printf("Filepath to open: %s", strings.TrimPrefix(filepath, "/"))
 	f, err := staticFiles.Open(strings.TrimPrefix(filepath, "/"))
@@ -97,7 +112,6 @@ func (cfg apiConfig) handlerStatic(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer f.Close()
-	ext := strings.ToLower(path.Ext(filepath))
 	w.Header().Set("Content-Type", contentTypes[ext])
 
 	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
@@ -106,5 +120,33 @@ func (cfg apiConfig) handlerStatic(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Error copying file to response: %v", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
+
+}
+
+func (cfg apiConfig) handlerLogin(w http.ResponseWriter, r *http.Request) {
+
+	// auth user
+	cfg.displayFileserverContent(w, "/login")
+
+}
+
+func (cfg apiConfig) handlerSignup(w http.ResponseWriter, r *http.Request) {
+	username := r.FormValue("username")
+	password := r.FormValue("password")
+	hashed_password, err := auth.HashPassword(password)
+	if err != nil {
+		log.Printf("Error hashin password: %v", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	err = cfg.db.AddUser(r.Context(), username, hashed_password)
+	if err != nil {
+		log.Printf("Error creating user: %v", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	log.Printf("Successfully added user")
+	cfg.displayFileserverContent(w, "/login")
 
 }

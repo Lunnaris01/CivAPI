@@ -19,10 +19,17 @@
                 <input type="password" id="password" name="password" required>
             </div>
             <div class="button-group">
-                <button type="submit" class="btn sign-in">Sign In</button>
-                <a href="/signup" class="btn sign-up">Sign Up</a>
+                <button type="submit" class="btn sign-in" onclick="setAction('/login')">Sign In</button>
+                <button type="submit" class="btn sign-up" onclick="setAction('/signup')">Sign Up</button>
             </div>
         </form>
     </div>
 </body>
+
+<script>
+    function setAction(actionUrl) {
+        document.getElementById('loginForm').action = actionUrl;
+    }
+</script>
+
 </html>
