@@ -19,42 +19,47 @@
                 <input type="password" id="password" name="password" required>
             </div>
             <div class="button-group">
-                <button type="submit" class="btn sign-in" onclick="setAction('/login')">Sign In</button>
+                <button type="submit" class="btn sign-in">Sign In</button>
                 <button type="submit" class="btn sign-up" onclick="setAction('/signup')">Sign Up</button>
             </div>
         </form>
     </div>
-</body>
 
-<script>
-    document.getElementById("loginForm").addEventListener("submit", async function(event) {
-        event.preventDefault(); // Prevent default form submission
+    <script>
+        // Handle login form submission
+        document.getElementById("loginForm").addEventListener("submit", async function(event) {
+            event.preventDefault(); // Prevent default form submission
 
-        const form = event.target;
-        const formData = new FormData(form);
-        const actionUrl = form.getAttribute("action");
+            const form = event.target;
+            const formData = new FormData(form);
+            const actionUrl = form.getAttribute("action");
 
-        try {
-            const response = await fetch(actionUrl, {
-                method: "POST",
-                body: formData
-            });
+            try {
+                const response = await fetch(actionUrl, {
+                    method: "POST",
+                    body: formData
+                });
 
-            const data = await response.json();
+                const data = await response.json();
 
-            if (response.ok) {
-                // Save token to localStorage
-                localStorage.setItem("accessToken", data.Token);
-                alert("Login successful!");
-                window.location.href = "/dashboard"; // Redirect to dashboard or another page
-            } else {
-                alert("Login failed: " + data.message);
+                if (response.ok) {
+                    // Save token to localStorage for future requests
+                    localStorage.setItem("accessToken", data.Token);
+                    alert("Login successful!");
+                    window.location.href = "/dashboard"; // Redirect to dashboard
+                } else {
+                    alert("Login failed: " + (data.message || "Unknown error"));
+                }
+            } catch (error) {
+                console.error("Error during login:", error);
+                alert("An error occurred. Please try again.");
             }
-        } catch (error) {
-            console.error("Error during login:", error);
-            alert("An error occurred. Please try again.");
-        }
-    });
-</script>
+        });
 
+        // Function to change form action dynamically (for signup)
+        function setAction(action) {
+            document.getElementById("loginForm").setAttribute("action", action);
+        }
+    </script>
+</body>
 </html>

@@ -80,13 +80,14 @@
             <button onclick="showContent('add-game')">Add Game</button>
             <button onclick="showContent('statistics')">Statistics</button>
             <button onclick="showContent('friendsgroups')">Friends & Groups</button>
+            <button onclick="logout()">Logout</button>
         </div>
 
         <!-- Content Sections -->
         <div id="list-games" class="content">
             <h2>List of Games</h2>
             <p>Here you can view all the games available.</p>
-            <!-- Add dynamic content here -->
+            <div id="games-list"></div>
         </div>
 
         <div id="add-game" class="content">
@@ -98,34 +99,77 @@
         <div id="statistics" class="content">
             <h2>Statistics</h2>
             <p>View your gaming statistics here.</p>
-            <!-- Add charts or other content here -->
+            <div id="stats-data"></div>
         </div>
 
         <div id="friendsgroups" class="content">
             <h2>Friends & Groups</h2>
             <p>Manage your friends and groups here.</p>
-            <!-- Add friends/groups management content here -->
+            <div id="friends-list"></div>
         </div>
     </div>
 
     <script>
         // Function to show the selected content and hide others
         function showContent(contentId) {
-            // Hide all content sections
             const contentSections = document.querySelectorAll('.content');
-            contentSections.forEach(section => {
-                section.classList.remove('active');
-            });
+            contentSections.forEach(section => section.classList.remove('active'));
 
-            // Show the selected content section
             const selectedContent = document.getElementById(contentId);
             if (selectedContent) {
                 selectedContent.classList.add('active');
+
+                // Load data dynamically when switching tabs
+                if (contentId === "list-games") loadGames();
+                if (contentId === "statistics") loadStats();
+                if (contentId === "friendsgroups") loadFriends();
             }
         }
 
-        // Optional: Show a default section on page load
-        window.onload = () => showContent('list-games');
+        // Function to fetch and display games
+        async function loadGames() {
+            const response = await fetchWithAuth("/api/games");
+            if (response && response.ok) {
+                const data = await response.json();
+                document.getElementById("games-list").innerHTML = JSON.stringify(data, null, 2);
+            } else {
+                document.getElementById("games-list").innerHTML = "Failed to load games.";
+            }
+        }
+
+        // Function to fetch and display statistics
+        async function loadStats() {
+            const response = await fetchWithAuth("/api/statistics");
+            if (response && response.ok) {
+                const data = await response.json();
+                document.getElementById("stats-data").innerHTML = JSON.stringify(data, null, 2);
+            } else {
+                document.getElementById("stats-data").innerHTML = "Failed to load statistics.";
+            }
+        }
+
+        // Function to fetch and display friends/groups
+        async function loadFriends() {
+            const response = await fetchWithAuth("/api/friends");
+            if (response && response.ok) {
+                const data = await response.json();
+                document.getElementById("friends-list").innerHTML = JSON.stringify(data, null, 2);
+            } else {
+                document.getElementById("friends-list").innerHTML = "Failed to load friends/groups.";
+            }
+        }
+
+        // Function to log out
+        function logout() {
+            localStorage.removeItem("accessToken");
+            window.location.href = "/";
+        }
+
+        // Run authentication check on page load
+        document.addEventListener("DOMContentLoaded", () => {
+            checkAuth();
+            showContent('list-games');
+        });
     </script>
 </body>
 </html>

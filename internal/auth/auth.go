@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"strings"
 	"time"
+	"log"
 )
 
 func HashPassword(password string) (string, error) {
@@ -95,6 +96,7 @@ func GetAPIKey(headers http.Header) (string, error) {
 func GetAuthKey(headers http.Header, keyName string) (string, error) {
 	authString := headers.Get("Authorization")
 	if authString == "" {
+		log.Printf(authString)
 		return "", fmt.Errorf("no Authorization key or empty value")
 	}
 	authString = strings.Trim(authString, " ")
@@ -105,3 +107,4 @@ func GetAuthKey(headers http.Header, keyName string) (string, error) {
 	authToken = strings.Trim(authToken, " ")
 	return authToken, nil
 }
+

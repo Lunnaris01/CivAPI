@@ -79,6 +79,7 @@ func main() {
 	router.Get("/*", apiCfg.handlerStatic)
 	router.Post("/login", apiCfg.handlerLogin)
 	router.Post("/signup", apiCfg.handlerSignup)
+	router.Get("/dashboard",apiCfg.handlerDashboard)
 
 	log.Printf("Server running and waiting for requests on port %v\n", apiCfg.port)
 	http.ListenAndServe(":"+apiCfg.port, router)
