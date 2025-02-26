@@ -20,7 +20,7 @@
             </div>
             <div class="button-group">
                 <button type="submit" class="btn sign-in">Sign In</button>
-                <button type="submit" class="btn sign-up" onclick="setAction('/signup')">Sign Up</button>
+                <a href="/signup" class="btn sign-up">Sign Up</a> <!-- Redirect to signup page -->
             </div>
         </form>
     </div>
@@ -32,10 +32,9 @@
 
             const form = event.target;
             const formData = new FormData(form);
-            const actionUrl = form.getAttribute("action");
 
             try {
-                const response = await fetch(actionUrl, {
+                const response = await fetch(form.action, {
                     method: "POST",
                     body: formData
                 });
@@ -46,7 +45,7 @@
                     // Save token to localStorage for future requests
                     localStorage.setItem("accessToken", data.Token);
                     alert("Login successful!");
-                    window.location.href = "/dashboard"; // Redirect to dashboard
+                    window.location.href = "/content"; // Redirect to dashboard
                 } else {
                     alert("Login failed: " + (data.message || "Unknown error"));
                 }
@@ -55,11 +54,6 @@
                 alert("An error occurred. Please try again.");
             }
         });
-
-        // Function to change form action dynamically (for signup)
-        function setAction(action) {
-            document.getElementById("loginForm").setAttribute("action", action);
-        }
     </script>
 </body>
 </html>

@@ -78,6 +78,7 @@ func (cfg apiConfig) handlerSignup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	log.Printf("Successfully added user")
-	cfg.displayFileserverContent(w, "/login")
-
+	respondWithJSON(w,200,struct{
+		Username string `json:"username"`
+	}{username})
 }

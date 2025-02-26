@@ -5,12 +5,13 @@ import (
 	"encoding/hex"
 	"fmt"
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/google/uuid"
+	//"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 	"net/http"
 	"strings"
 	"time"
 	"log"
+	"strconv"
 )
 
 func HashPassword(password string) (string, error) {
@@ -41,30 +42,26 @@ func MakeJWT(userID int, tokenSecret string, expiresIn time.Duration) (string, e
 			Issuer:    "civAPI",
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(expiresIn)),
-			Subject:   string(userID),
+			Subject:   strconv.Itoa(userID),
 		})
 	ss, err := new_token.SignedString([]byte(tokenSecret))
 	return ss, err
 
 }
 
-func ValidateJWT(tokenString, tokenSecret string) (uuid.UUID, error) {
+func ValidateJWT(tokenString, tokenSecret string) (string, error) {
 
 	token, err := jwt.ParseWithClaims(tokenString, &jwt.RegisteredClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return []byte(tokenSecret), nil
 	})
 	if err != nil {
-		return uuid.UUID{}, err
+		return "", err
 	}
 	userIDStr, err := token.Claims.GetSubject()
 	if err != nil {
-		return uuid.UUID{}, err
+		return "", err
 	}
-	userIDUUID, err := uuid.Parse(userIDStr)
-	if err != nil {
-		return uuid.UUID{}, err
-	}
-	return userIDUUID, nil
+	return userIDStr, nil
 }
 
 func GetBearerToken(headers http.Header) (string, error) {

@@ -79,7 +79,8 @@ func main() {
 	router.Get("/*", apiCfg.handlerStatic)
 	router.Post("/login", apiCfg.handlerLogin)
 	router.Post("/signup", apiCfg.handlerSignup)
-	router.Get("/dashboard",apiCfg.handlerDashboard)
+	router.Get("/content",apiCfg.handlerDashboard)
+	router.Get("/api/games",apiCfg.handlerGetGames)
 
 	log.Printf("Server running and waiting for requests on port %v\n", apiCfg.port)
 	http.ListenAndServe(":"+apiCfg.port, router)
@@ -97,7 +98,7 @@ func (cfg apiConfig) displayFileserverContent(w http.ResponseWriter, filepath st
 	log.Printf("Requested path: %s", filepath)
 	var ext string
 	if filepath == "/" {
-		filepath = "/static/html/index.html"
+		filepath = "/static/html/login.html"
 	} else if !strings.HasPrefix(filepath, "/static/") {
 		ext = strings.ToLower(path.Ext(filepath))
 		if ext == ".css" {
