@@ -35,9 +35,9 @@ var contentTypes = map[string]string{
 }
 
 type apiConfig struct {
-	db       *database.Queries
-	platform string
-	port     string
+	db        *database.Queries
+	platform  string
+	port      string
 	secretKey string
 }
 
@@ -67,10 +67,10 @@ func main() {
 	log.Println("Database connection successful!")
 
 	apiCfg := apiConfig{
-		db:       	dbQueries,
-		platform: 	env_platform,
-		port:     	env_port,
-		secretKey:	evn_secret,
+		db:        dbQueries,
+		platform:  env_platform,
+		port:      env_port,
+		secretKey: evn_secret,
 	}
 
 	router := chi.NewRouter()
@@ -79,8 +79,8 @@ func main() {
 	router.Get("/*", apiCfg.handlerStatic)
 	router.Post("/login", apiCfg.handlerLogin)
 	router.Post("/signup", apiCfg.handlerSignup)
-	router.Get("/content",apiCfg.handlerDashboard)
-	router.Get("/api/games",apiCfg.handlerGetGames)
+	router.Get("/content", apiCfg.handlerDashboard)
+	router.Get("/api/games", apiCfg.handlerGetGames)
 
 	log.Printf("Server running and waiting for requests on port %v\n", apiCfg.port)
 	http.ListenAndServe(":"+apiCfg.port, router)

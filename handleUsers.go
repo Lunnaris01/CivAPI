@@ -1,23 +1,17 @@
 package main
 
 import (
+	"github.com/Lunnaris01/CivAPI/internal/auth"
+	"github.com/Lunnaris01/CivAPI/internal/database"
 	"log"
 	"net/http"
 	"time"
-	"github.com/Lunnaris01/CivAPI/internal/auth"
-	"github.com/Lunnaris01/CivAPI/internal/database"
-
 )
-
-
-
-
-
 
 func (cfg apiConfig) handlerLogin(w http.ResponseWriter, r *http.Request) {
 	username := r.FormValue("username")
 	password := r.FormValue("password")
-	user,err := cfg.db.GetUserByUsername(r.Context(),username)
+	user, err := cfg.db.GetUserByUsername(r.Context(), username)
 	if err != nil {
 		log.Printf("Unable to find User: %v", err)
 		respondWithError(w, http.StatusInternalServerError, "Unable to find User", err)
@@ -25,9 +19,9 @@ func (cfg apiConfig) handlerLogin(w http.ResponseWriter, r *http.Request) {
 		cfg.displayFileserverContent(w, "/")
 		return
 	}
-	log.Printf("Trying to log in User %s",user.Username)
+	log.Printf("Trying to log in User %s", user.Username)
 
-	err = auth.CheckPasswordHash(password,user.HashedPassword)
+	err = auth.CheckPasswordHash(password, user.HashedPassword)
 	if err != nil {
 		log.Printf("Unable to authenticate User: %v", err)
 		respondWithError(w, http.StatusInternalServerError, "Unable to autenticate User", err)
@@ -44,17 +38,17 @@ func (cfg apiConfig) handlerLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	type response struct{
-		User database.User
+	type response struct {
+		User  database.User
 		Token string
 	}
 
 	respondWithJSON(w, http.StatusOK, response{
 		User: database.User{
-			ID:        user.ID,
+			ID:       user.ID,
 			Username: user.Username,
 		},
-		Token:        accessToken,
+		Token: accessToken,
 	})
 
 	//cfg.displayFileserverContent(w, "/login")
@@ -78,7 +72,7 @@ func (cfg apiConfig) handlerSignup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	log.Printf("Successfully added user")
-	respondWithJSON(w,200,struct{
+	respondWithJSON(w, 200, struct {
 		Username string `json:"username"`
 	}{username})
 }
