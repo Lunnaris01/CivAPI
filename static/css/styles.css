@@ -97,3 +97,78 @@ body {
 .sign-up:hover {
     background-color: #1b2a41; /* Slightly lighter dark blue on hover */
 }
+
+/* Table Styling */
+#games-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1.5rem;
+    background-color: #112240; /* Slightly lighter dark blue */
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+#games-table th,
+#games-table td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid #233554; /* Dark border */
+}
+
+#games-table th {
+    background-color: #166aa1; /* Teal accent color for headers */
+    color: #ccd6f6; /* Light text color */
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+#games-table td {
+    color: #ccd6f6; /* Light text color */
+    font-size: 0.9rem;
+}
+
+/* Row Coloring */
+#games-table tr.won {
+    background-color: #256d28; /* Green for won games */
+}
+
+#games-table tr.lost {
+    background-color: #972c2c; /* Red for lost games */
+}
+
+#games-table tr:hover {
+    opacity: 0.9;
+    transition: opacity 0.2s ease;
+}
+
+/* Country Flag Styling */
+.country-flag {
+    width: 24px;
+    height: 16px;
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+
+/* Add some spacing and alignment for the table container */
+#list-games {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+    background-color: #112240; /* Slightly lighter dark blue */
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+#list-games h2 {
+    color: #166aa1; /* Teal accent color */
+    margin-bottom: 1.5rem;
+    font-size: 2rem;
+}
+
+#list-games p {
+    color: #8892b0; /* Light gray for text */
+    margin-bottom: 1.5rem;
+}

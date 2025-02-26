@@ -44,16 +44,45 @@
                 if (response.ok) {
                     // Save token to localStorage for future requests
                     localStorage.setItem("accessToken", data.Token);
-                    alert("Login successful!");
+                    tempAlert("Login successful! Redirecting...", 3000, true);
                     window.location.href = "/content"; // Redirect to dashboard
                 } else {
-                    alert("Login failed: " + (data.message || "Unknown error"));
+                    tempAlert("Login failed: " + (data.message || "Unknown error"),10000,false);
                 }
             } catch (error) {
                 console.error("Error during login:", error);
-                alert("An error occurred. Please try again.");
+                tempAlert("Failed to Log In! Make sure your Password and Username are correct!",10000,false);
             }
         });
+
+
+        function tempAlert(msg, duration, isSuccess) {
+            // Create the alert element
+            const el = document.createElement("div");
+            el.setAttribute("style", `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                padding: 15px;
+                text-align: center;
+                color: white;
+                font-family: Arial, sans-serif;
+                font-size: 16px;
+                background-color: ${isSuccess ? "#4CAF50" : "#F44336"}; /* Green for success, red for failure */
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+                z-index: 1000;
+            `);
+            el.innerHTML = msg;
+
+            // Append the alert to the body
+            document.body.appendChild(el);
+
+            // Remove the alert after the specified duration
+            setTimeout(() => {
+                el.parentNode.removeChild(el);
+            }, duration);
+        }
     </script>
 </body>
 </html>
