@@ -81,6 +81,7 @@ func main() {
 	router.Post("/signup", apiCfg.handlerSignup)
 	router.Get("/content", apiCfg.handlerDashboard)
 	router.Get("/api/games", apiCfg.handlerGetGames)
+	router.Post("/api/games", apiCfg.handlerAddGame)
 
 	log.Printf("Server running and waiting for requests on port %v\n", apiCfg.port)
 	http.ListenAndServe(":"+apiCfg.port, router)

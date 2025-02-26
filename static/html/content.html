@@ -87,15 +87,52 @@
         <div id="list-games" class="content">
             <h2>List of Games</h2>
             <p>Here you can view all the games available.</p>
-            <div id="games-list"></div>
+            <table id="games-table">
+                <thead>
+                    <tr>
+                        <th>Country</th>
+                        <th>Date</th>
+                        <th>Win Condition</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Rows will be dynamically inserted here -->
+                </tbody>
+            </table>
         </div>
 
         <div id="add-game" class="content">
             <h2>Add a New Game</h2>
             <p>Use this section to add a new game to the database.</p>
-            <!-- Add a form or other content here -->
-        </div>
-
+            <form id="add-game-form">
+                <!-- Country Selector -->
+                <label for="country-select">Select Country:</label>
+                <select id="country" name="country">
+                    <option value="Greece">Greece</option>
+                    <option value="Germany">Germany</option>
+                    <option value="France">France</option>
+                    <option value="Russia">Russia</option>
+                </select>
+        
+                <!-- Game Won Checkbox -->
+                <label for="game-won">Did you win?</label>
+                <input type="checkbox" id="game_won" name="game_won">
+        
+                <!-- Win Condition Dropdown -->
+                <label for="win-condition">Win Condition:</label>
+                <select id="win_condition" name="win_condition">
+                    <option value="Domination">Domination</option>
+                    <option value="Science">Science</option>
+                    <option value="Culture">Culture</option>
+                    <option value="Diplomacy">Diplomacy</option>
+                </select>
+        
+                <!-- Submit Button -->
+                <button type="submit">Submit</button>
+            </form>
+            <div id="add-game-result"></div> <!-- To display the result of adding a game -->
+        </div>        
+        
         <div id="statistics" class="content">
             <h2>Statistics</h2>
             <p>View your gaming statistics here.</p>
@@ -110,6 +147,36 @@
     </div>
 
     <script>
+        async function addGame() {
+            // Get form values
+            const country = document.getElementById("country").value;
+            const game_won = document.getElementById("game_won").checked; // Boolean value
+            const win_condition = document.getElementById("win_condition").value;
+
+            // Prepare the request body
+            const requestBody = {
+                country: country,
+                game_won: game_won,
+                win_condition: win_condition
+            };
+
+            // Send the POST request
+            const response = await fetchWithAuth("/api/games", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(requestBody)
+            });
+
+            // Handle the response
+            if (response && response.ok) {
+                document.getElementById("add-game-result").innerHTML = "Game added successfully!";
+            } else {
+                document.getElementById("add-game-result").innerHTML = "Failed to add the game.";
+            }
+        }
+
 
         // Function to fetch data with authorization header
         async function fetchWithAuth(url, options = {}) {
@@ -154,18 +221,56 @@
             }
         }
 
-        // Function to fetch and display games
-        // Function to fetch and display games
+        // Function to fetch and display games in a table
         async function loadGames() {
             const response = await fetchWithAuth("/api/games");
             if (response && response.ok) {
                 const data = await response.json();
-                document.getElementById("games-list").innerHTML = JSON.stringify(data, null, 2);
+                displayGames(data);
             } else {
                 document.getElementById("games-list").innerHTML = "Failed to load games.";
             }
         }
 
+        // Function to display games in a table
+        function displayGames(games) {
+            const gamesTableBody = document.querySelector("#games-table tbody");
+            gamesTableBody.innerHTML = ""; // Clear existing rows
+
+            games.forEach(game => {
+                const row = document.createElement("tr");
+
+                // Add row class based on whether the game was won
+                if (game.GameWon) {
+                    row.classList.add("won"); // Green for won games
+                } else {
+                    row.classList.add("lost"); // Red for lost games
+                }
+
+                // Add Country with Flag
+                const countryCell = document.createElement("td");
+                const flagImg = document.createElement("img");
+                flagImg.src = `/static/images/countries/${game.Country.toLowerCase()}.webp`; // Path to flag image
+                flagImg.alt = `${game.Country} Flag`;
+                flagImg.classList.add("country-flag");
+                countryCell.appendChild(flagImg);
+                countryCell.appendChild(document.createTextNode(game.Country));
+                row.appendChild(countryCell);
+
+                // Add Date (formatted)
+                const dateCell = document.createElement("td");
+                const createdAtDate = new Date(game.CreatedAt);
+                dateCell.textContent = createdAtDate.toLocaleDateString(); // Format as a simple date
+                row.appendChild(dateCell);
+
+                // Add Win Condition
+                const winConditionCell = document.createElement("td");
+                winConditionCell.textContent = game.WinCondition;
+                row.appendChild(winConditionCell);
+
+                gamesTableBody.appendChild(row);
+            });
+        }        
         // Function to fetch and display statistics
         async function loadStats() {
             const response = await fetchWithAuth("/api/statistics");
@@ -193,6 +298,13 @@
             localStorage.removeItem("accessToken");
             window.location.href = "/";
         }
+
+        // Add event listener for the "Add Game" form submission
+        document.getElementById("add-game-form").addEventListener("submit", async function(event) {
+            event.preventDefault(); // Prevent the default form submission
+            await addGame(); // Call the addGame function
+        });
+
 
         // Run authentication check on page load
         document.addEventListener("DOMContentLoaded", () => {

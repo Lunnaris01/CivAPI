@@ -19,16 +19,18 @@ import (
 */
 
 type Game struct {
-	ID        int
-	UserID    int
-	Country   string
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	ID           int
+	UserID       int
+	Country      string
+	GameWon      bool
+	WinCondition string
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
 }
 
-func (q *Queries) AddGame(ctx context.Context, userID int, country string) error {
+func (q *Queries) AddGame(ctx context.Context, userID int, country string, gameWon bool, winCondition string) error {
 	// Define the query string
-	queryString := "INSERT INTO games (user_id, country) VALUES (?, ?)"
+	queryString := "INSERT INTO games (user_id, country, game_won, win_condition) VALUES (?, ?, ?, ?)"
 
 	stmt, err := q.PrepareContext(ctx, queryString)
 	if err != nil {
@@ -36,12 +38,12 @@ func (q *Queries) AddGame(ctx context.Context, userID int, country string) error
 	}
 	defer stmt.Close() // Ensure the statement is closed after use
 	// Execute the statement with the provided parameters
-	_, err = stmt.ExecContext(ctx, userID, country)
+	_, err = stmt.ExecContext(ctx, userID, country, gameWon, winCondition)
 	if err != nil {
 		return fmt.Errorf("failed to execute statement: %w", err)
 	}
 
-	log.Println("User added successfully")
+	log.Println("Game added successfully")
 	return nil
 }
 
@@ -66,6 +68,8 @@ func (q *Queries) GetGamesByUserID(ctx context.Context, userID string) ([]Game, 
 			&i.ID,
 			&i.UserID,
 			&i.Country,
+			&i.GameWon,
+			&i.WinCondition,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {
