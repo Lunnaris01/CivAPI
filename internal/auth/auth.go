@@ -7,11 +7,11 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	//"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
+	"log"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
-	"log"
-	"strconv"
 )
 
 func HashPassword(password string) (string, error) {
@@ -104,4 +104,3 @@ func GetAuthKey(headers http.Header, keyName string) (string, error) {
 	authToken = strings.Trim(authToken, " ")
 	return authToken, nil
 }
-

@@ -7,7 +7,6 @@ import (
 	"time"
 )
 
-
 /*
 	User:
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -20,12 +19,12 @@ import (
 */
 
 type User struct {
-	ID int
-	Username string
+	ID             int
+	Username       string
 	HashedPassword string
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	IsContributer bool
+	CreatedAt      time.Time
+	UpdatedAt      time.Time
+	IsContributer  bool
 }
 
 func (q *Queries) AddUser(ctx context.Context, username, hashedPassword string) error {
@@ -47,23 +46,21 @@ func (q *Queries) AddUser(ctx context.Context, username, hashedPassword string) 
 	return nil
 }
 
-
-
-func (q *Queries) GetUserByUsername(ctx context.Context, username string) (User,error) {
+func (q *Queries) GetUserByUsername(ctx context.Context, username string) (User, error) {
 	// Define the query string
 	queryString := "SELECT * FROM users WHERE username=?"
 
 	stmt, err := q.PrepareContext(ctx, queryString)
 	if err != nil {
-		return User{},fmt.Errorf("failed to prepare statement: %w", err)
+		return User{}, fmt.Errorf("failed to prepare statement: %w", err)
 	}
 	defer stmt.Close() // Ensure the statement is closed after use
 	// Execute the statement with the provided parameters
 	var user User
-	err = stmt.QueryRowContext(ctx, username).Scan(&user.ID,&user.Username,&user.HashedPassword,&user.CreatedAt,&user.UpdatedAt,&user.IsContributer)
+	err = stmt.QueryRowContext(ctx, username).Scan(&user.ID, &user.Username, &user.HashedPassword, &user.CreatedAt, &user.UpdatedAt, &user.IsContributer)
 	if err != nil {
-		return User{},fmt.Errorf("failed to fetch User from Database: %w", err)
+		return User{}, fmt.Errorf("failed to fetch User from Database: %w", err)
 	}
 
-	return user,nil
+	return user, nil
 }
