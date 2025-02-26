@@ -1,12 +1,12 @@
 -- +goose Up
-CREATE TABLE users (
+CREATE TABLE games (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    username TEXT NOT NULL UNIQUE,
-    hashed_password TEXT NOT NULL,
+    user_id INTEGER,
+    country TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    is_contributer BOOLEAN NOT NULL DEFAULT false
+	FOREIGN KEY(user_id) REFERENCES users(id)
 );
 
 -- +goose Down
-DROP TABLE users;
+DROP TABLE games;

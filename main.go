@@ -11,7 +11,7 @@ import (
 	"path"
 	"strings"
 
-	"github.com/Lunnaris01/CivAPI/internal/auth"
+	//"github.com/Lunnaris01/CivAPI/internal/auth"
 	"github.com/Lunnaris01/CivAPI/internal/database"
 
 	"github.com/go-chi/chi/v5"
@@ -35,9 +35,10 @@ var contentTypes = map[string]string{
 }
 
 type apiConfig struct {
-	db       *database.Queries
-	platform string
-	port     string
+	db        *database.Queries
+	platform  string
+	port      string
+	secretKey string
 }
 
 func main() {
@@ -51,6 +52,7 @@ func main() {
 	env_dbURL := os.Getenv("TURSO_DATABASE_BASE")
 	env_dbToken := os.Getenv("TURSO_AUTH_TOKEN")
 	env_port := os.Getenv("PORT")
+	evn_secret := os.Getenv("SECRET_KEY")
 	dbCombinedURL := env_dbURL + "?authToken=" + env_dbToken
 	log.Printf("Connecting to db at %s,", env_dbURL)
 
@@ -65,9 +67,10 @@ func main() {
 	log.Println("Database connection successful!")
 
 	apiCfg := apiConfig{
-		db:       dbQueries,
-		platform: env_platform,
-		port:     env_port,
+		db:        dbQueries,
+		platform:  env_platform,
+		port:      env_port,
+		secretKey: evn_secret,
 	}
 
 	router := chi.NewRouter()
@@ -76,6 +79,8 @@ func main() {
 	router.Get("/*", apiCfg.handlerStatic)
 	router.Post("/login", apiCfg.handlerLogin)
 	router.Post("/signup", apiCfg.handlerSignup)
+	router.Get("/content", apiCfg.handlerDashboard)
+	router.Get("/api/games", apiCfg.handlerGetGames)
 
 	log.Printf("Server running and waiting for requests on port %v\n", apiCfg.port)
 	http.ListenAndServe(":"+apiCfg.port, router)
@@ -93,13 +98,15 @@ func (cfg apiConfig) displayFileserverContent(w http.ResponseWriter, filepath st
 	log.Printf("Requested path: %s", filepath)
 	var ext string
 	if filepath == "/" {
-		filepath = "/static/html/index.html"
+		filepath = "/static/html/login.html"
 	} else if !strings.HasPrefix(filepath, "/static/") {
 		ext = strings.ToLower(path.Ext(filepath))
 		if ext == ".css" {
 			filepath = "/static/css" + filepath
 		} else if ext == ".html" {
 			filepath = "/static/html" + filepath
+		} else if ext == ".ico" {
+			filepath = "/static/images" + filepath
 		} else {
 			filepath = "/static/html" + filepath + ".html"
 		}
@@ -120,33 +127,5 @@ func (cfg apiConfig) displayFileserverContent(w http.ResponseWriter, filepath st
 		log.Printf("Error copying file to response: %v", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
-
-}
-
-func (cfg apiConfig) handlerLogin(w http.ResponseWriter, r *http.Request) {
-
-	// auth user
-	cfg.displayFileserverContent(w, "/login")
-
-}
-
-func (cfg apiConfig) handlerSignup(w http.ResponseWriter, r *http.Request) {
-	username := r.FormValue("username")
-	password := r.FormValue("password")
-	hashed_password, err := auth.HashPassword(password)
-	if err != nil {
-		log.Printf("Error hashin password: %v", err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	err = cfg.db.AddUser(r.Context(), username, hashed_password)
-	if err != nil {
-		log.Printf("Error creating user: %v", err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	log.Printf("Successfully added user")
-	cfg.displayFileserverContent(w, "/login")
 
 }

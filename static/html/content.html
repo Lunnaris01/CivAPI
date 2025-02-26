@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Dashboard</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <style>
+        /* Additional styles specific to this page */
+        .dashboard-container {
+            background-color: #112240; /* Slightly lighter dark blue */
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 800px;
+            text-align: center;
+        }
+
+        .dashboard-container h1 {
+            margin-bottom: 1.5rem;
+            font-size: 2rem;
+            color: #64ffda; /* Teal accent color */
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .button-container button {
+            flex: 1;
+            padding: 0.75rem;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            background-color: #233554; /* Dark blue button */
+            color: #ccd6f6; /* Light text color */
+        }
+
+        .button-container button:hover {
+            background-color: #1b2a41; /* Slightly lighter dark blue on hover */
+        }
+
+        .content {
+            display: none; /* Hidden by default */
+            text-align: left;
+            padding: 1rem;
+            background-color: #0a192f; /* Dark blue background */
+            border: 1px solid #233554; /* Dark border */
+            border-radius: 5px;
+            margin-top: 1rem;
+        }
+
+        .content.active {
+            display: block; /* Show when active */
+        }
+
+        .content h2 {
+            margin-bottom: 1rem;
+            color: #64ffda; /* Teal accent color */
+        }
+
+        .content p {
+            color: #8892b0; /* Light gray for text */
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <h1>Welcome to the Game Dashboard</h1>
+
+        <!-- Button Container -->
+        <div class="button-container">
+            <button onclick="showContent('list-games')">List Games</button>
+            <button onclick="showContent('add-game')">Add Game</button>
+            <button onclick="showContent('statistics')">Statistics</button>
+            <button onclick="showContent('friendsgroups')">Friends & Groups</button>
+            <button onclick="logout()">Logout</button>
+        </div>
+
+        <!-- Content Sections -->
+        <div id="list-games" class="content">
+            <h2>List of Games</h2>
+            <p>Here you can view all the games available.</p>
+            <div id="games-list"></div>
+        </div>
+
+        <div id="add-game" class="content">
+            <h2>Add a New Game</h2>
+            <p>Use this section to add a new game to the database.</p>
+            <!-- Add a form or other content here -->
+        </div>
+
+        <div id="statistics" class="content">
+            <h2>Statistics</h2>
+            <p>View your gaming statistics here.</p>
+            <div id="stats-data"></div>
+        </div>
+
+        <div id="friendsgroups" class="content">
+            <h2>Friends & Groups</h2>
+            <p>Manage your friends and groups here.</p>
+            <div id="friends-list"></div>
+        </div>
+    </div>
+
+    <script>
+
+        // Function to fetch data with authorization header
+        async function fetchWithAuth(url, options = {}) {
+            const token = localStorage.getItem("accessToken");
+            if (!token) {
+                alert("No access token found. Please log in.");
+                window.location.href = "/";
+                return;
+            }
+
+            const headers = new Headers(options.headers || {});
+            headers.append("Authorization", `Bearer ${token}`);
+
+            const response = await fetch(url, {
+                ...options,
+                headers: headers
+            });
+
+            if (response.status === 401) {
+                // Token is invalid or expired
+                localStorage.removeItem("accessToken");
+                alert("Session expired. Please log in again.");
+                window.location.href = "/";
+                return;
+            }
+
+            return response;
+        }
+        // Function to show the selected content and hide others
+        function showContent(contentId) {
+            const contentSections = document.querySelectorAll('.content');
+            contentSections.forEach(section => section.classList.remove('active'));
+
+            const selectedContent = document.getElementById(contentId);
+            if (selectedContent) {
+                selectedContent.classList.add('active');
+
+                // Load data dynamically when switching tabs
+                if (contentId === "list-games") loadGames();
+                if (contentId === "statistics") loadStats();
+                if (contentId === "friendsgroups") loadFriends();
+            }
+        }
+
+        // Function to fetch and display games
+        // Function to fetch and display games
+        async function loadGames() {
+            const response = await fetchWithAuth("/api/games");
+            if (response && response.ok) {
+                const data = await response.json();
+                document.getElementById("games-list").innerHTML = JSON.stringify(data, null, 2);
+            } else {
+                document.getElementById("games-list").innerHTML = "Failed to load games.";
+            }
+        }
+
+        // Function to fetch and display statistics
+        async function loadStats() {
+            const response = await fetchWithAuth("/api/statistics");
+            if (response && response.ok) {
+                const data = await response.json();
+                document.getElementById("stats-data").innerHTML = JSON.stringify(data, null, 2);
+            } else {
+                document.getElementById("stats-data").innerHTML = "Failed to load statistics.";
+            }
+        }
+
+        // Function to fetch and display friends/groups
+        async function loadFriends() {
+            const response = await fetchWithAuth("/api/friends");
+            if (response && response.ok) {
+                const data = await response.json();
+                document.getElementById("friends-list").innerHTML = JSON.stringify(data, null, 2);
+            } else {
+                document.getElementById("friends-list").innerHTML = "Failed to load friends/groups.";
+            }
+        }
+
+        // Function to log out
+        function logout() {
+            localStorage.removeItem("accessToken");
+            window.location.href = "/";
+        }
+
+        // Run authentication check on page load
+        document.addEventListener("DOMContentLoaded", () => {
+            checkAuth();
+            showContent('list-games');
+        });
+    </script>
+</body>
+</html>

@@ -4,6 +4,8 @@ CREATE TABLE leaders (
     name TEXT NOT NULL UNIQUE,
     description TEXT NOT NULL,
     country TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- +goose Down
