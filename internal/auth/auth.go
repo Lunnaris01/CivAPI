@@ -93,7 +93,7 @@ func GetAPIKey(headers http.Header) (string, error) {
 func GetAuthKey(headers http.Header, keyName string) (string, error) {
 	authString := headers.Get("Authorization")
 	if authString == "" {
-		log.Printf(authString)
+		log.Printf("Empty Authstring!")
 		return "", fmt.Errorf("no Authorization key or empty value")
 	}
 	authString = strings.Trim(authString, " ")
