@@ -7,7 +7,7 @@ Technologies:
 - Database and Database Migration: sqlite (Turso) and goose
 - Router: [Chi](https://github.com/go-chi/chi/tree/master)
 - CI using Github Actions
-- CD using docker and gcloud
+- CD using docker and gcloud (currently not in use!)
 - Simple Frontend with HTML, CSS and JS
 
 (Upcoming) Features:
