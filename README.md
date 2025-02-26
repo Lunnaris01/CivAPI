@@ -26,7 +26,7 @@ Optional Long Term Goals:
 CD using docker+gcloud.
 Improve Frontend to have great looking visualization for the statistics.
 
-## 🤝 Contributing
+## Usage 
 
 ### Clone the repo
 
@@ -41,17 +41,32 @@ cd CivAPI
 make build
 ```
 
-### Run the project
+### Start the Server
 
 ```bash
 make run
 ```
+## 🤝 Contributing
+
+Add Code and Tests
 
 ### Run the tests
 
 ```bash
 go test ./...
 ```
+
+### Ensure your code adheres to style conventions and passes the staticcheck:
+
+
+```bash
+go fmt ./...
+```
+
+```bash
+staticcheck ./...
+```
+
 
 ### Submit a pull request
 
