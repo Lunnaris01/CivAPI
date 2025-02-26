@@ -26,3 +26,33 @@ Optional Long Term Goals:
 CD using docker+gcloud.
 Improve Frontend to have great looking visualization for the statistics.
 
+## 🤝 Contributing
+
+### Clone the repo
+
+```bash
+git clone https://github.com/Lunnaris01/CivAPI@latest
+cd CivAPI
+```
+
+### Build the project
+
+```bash
+make build
+```
+
+### Run the project
+
+```bash
+make run
+```
+
+### Run the tests
+
+```bash
+go test ./...
+```
+
+### Submit a pull request
+
+If you'd like to contribute, please fork the repository and open a pull request to the `main` branch. 
