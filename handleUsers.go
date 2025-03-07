@@ -1,11 +1,13 @@
 package main
 
 import (
-	"github.com/Lunnaris01/CivAPI/internal/auth"
-	"github.com/Lunnaris01/CivAPI/internal/database"
 	"log"
 	"net/http"
 	"time"
+
+	"github.com/Lunnaris01/CivAPI/internal/auth"
+	"github.com/Lunnaris01/CivAPI/internal/database"
+	"github.com/google/uuid"
 )
 
 func (cfg apiConfig) handlerLogin(w http.ResponseWriter, r *http.Request) {
@@ -58,6 +60,9 @@ func (cfg apiConfig) handlerLogin(w http.ResponseWriter, r *http.Request) {
 func (cfg apiConfig) handlerSignup(w http.ResponseWriter, r *http.Request) {
 	username := r.FormValue("username")
 	password := r.FormValue("password")
+	displayname := r.FormValue("displayName")
+	friendscode := uuid.New().String()
+
 	hashed_password, err := auth.HashPassword(password)
 	if err != nil {
 		log.Printf("Error hashin password: %v", err)
@@ -65,7 +70,7 @@ func (cfg apiConfig) handlerSignup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = cfg.db.AddUser(r.Context(), username, hashed_password)
+	err = cfg.db.AddUser(r.Context(), username, displayname, friendscode, hashed_password)
 	if err != nil {
 		log.Printf("Error creating user: %v", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)

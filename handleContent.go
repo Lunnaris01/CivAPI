@@ -91,6 +91,11 @@ func (cfg apiConfig) handlerAddGame(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	err = cfg.db.AddUsersGamesEntry(r.Context(), userID, gameID)
+	if err != nil {
+		log.Printf("Failed to add Entry to users_games table")
+		respondWithError(w, http.StatusBadRequest, "Error adding the game", err)
+		return
+	}
 	log.Printf("Added new Game to the Database!")
 	w.WriteHeader(http.StatusCreated)
 	w.Write([]byte("Added Successful"))
