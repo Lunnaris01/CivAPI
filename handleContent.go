@@ -2,11 +2,12 @@ package main
 
 import (
 	"encoding/json"
-	"github.com/Lunnaris01/CivAPI/internal/auth"
 	"io"
 	"log"
 	"net/http"
 	"strconv"
+
+	"github.com/Lunnaris01/CivAPI/internal/auth"
 )
 
 func (cfg apiConfig) handlerDashboard(w http.ResponseWriter, r *http.Request) {
@@ -83,12 +84,13 @@ func (cfg apiConfig) handlerAddGame(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = cfg.db.AddGame(r.Context(), userID, rBody.Country, rBody.GameWon, rBody.WinCondition)
+	gameID, err := cfg.db.AddGame(r.Context(), userID, rBody.Country, rBody.GameWon, rBody.WinCondition)
 	if err != nil {
 		log.Printf("Failed to add new Game to the Database")
 		respondWithError(w, http.StatusBadRequest, "Error adding the game", err)
 		return
 	}
+	err = cfg.db.AddUsersGamesEntry(r.Context(), userID, gameID)
 	log.Printf("Added new Game to the Database!")
 	w.WriteHeader(http.StatusCreated)
 	w.Write([]byte("Added Successful"))

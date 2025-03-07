@@ -28,23 +28,25 @@ type Game struct {
 	UpdatedAt    time.Time
 }
 
-func (q *Queries) AddGame(ctx context.Context, userID int, country string, gameWon bool, winCondition string) error {
+func (q *Queries) AddGame(ctx context.Context, userID int, country string, gameWon bool, winCondition string) (int, error) {
 	// Define the query string
-	queryString := "INSERT INTO games (user_id, country, game_won, win_condition) VALUES (?, ?, ?, ?)"
+	queryString := "INSERT INTO games (user_id, country, game_won, win_condition) VALUES (?, ?, ?, ?) RETURNING id"
 
 	stmt, err := q.PrepareContext(ctx, queryString)
 	if err != nil {
-		return fmt.Errorf("failed to prepare statement: %w", err)
+		return 0, fmt.Errorf("failed to prepare statement: %w", err)
 	}
 	defer stmt.Close() // Ensure the statement is closed after use
 	// Execute the statement with the provided parameters
-	_, err = stmt.ExecContext(ctx, userID, country, gameWon, winCondition)
+	game, err := stmt.ExecContext(ctx, userID, country, gameWon, winCondition)
 	if err != nil {
-		return fmt.Errorf("failed to execute statement: %w", err)
+		return 0, fmt.Errorf("failed to execute statement: %w", err)
 	}
+	gameID, err := game.LastInsertId()
+	log.Printf("Gameid: %v", gameID)
 
 	log.Println("Game added successfully")
-	return nil
+	return int(gameID), nil
 }
 
 func (q *Queries) GetGamesByUserID(ctx context.Context, userID string) ([]Game, error) {
