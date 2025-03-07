@@ -140,7 +140,7 @@ Authorization: Bearer <JWT_TOKEN>
     "password": "your_password",
     "displayName": "your_display_name"
   }
-  \```
+  ```
 - **Response**:
   ```json
   {
@@ -154,7 +154,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 #### **Get Games**
 - **Endpoint**: `GET /api/games`
-- **Description**: Retrieve a list of games associated with the authenticated user.
+- **Description**: Retrieve a list of games associated with the authenticated user. The GameCode can be used to share the game with friends who can add themselves to the game.
 - **Headers**:
   ```
   Authorization: Bearer <JWT_TOKEN>
@@ -163,29 +163,38 @@ Authorization: Bearer <JWT_TOKEN>
   ```json
   [
     {
-      "ID": "game_id",
       "Country": "game_country",
       "GameWon": true,
-      "WinCondition": "victory_type"
+      "WinCondition": "victory_type",
+      "GameCode": "123454345321"
     }
   ]
   ```
 
 #### **Add Game**
 - **Endpoint**: `POST /api/games`
-- **Description**: Add a new game for the authenticated user.
+- **Description**: Add a new game for the authenticated user. There is 2 options to do this, First is by having a country, game_won and win_condition present without sending a GameCode or sending a Gamecode.
 - **Headers**:
   ```
   Authorization: Bearer <JWT_TOKEN>
   ```
 - **Request Body**:
+- Add a new game via form
   ```json
   {
     "country": "game_country",
     "game_won": true,
-    "win_condition": "victory_type"
+    "win_condition": "victory_type",
   }
   ```
+  
+- Add the user to an existing game from another player  
+  ```json
+  {
+    "GameCode": "123454345321"
+  }
+  ```
+
 - **Response**:
   ```
   Added Successfully

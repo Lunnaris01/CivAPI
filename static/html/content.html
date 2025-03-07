@@ -93,6 +93,7 @@
                         <th>Country</th>
                         <th>Date</th>
                         <th>Win Condition</th>
+                        <th>Sharecode </th>
                     </tr>
                 </thead>
                 <tbody>
@@ -130,7 +131,15 @@
                 <!-- Submit Button -->
                 <button type="submit">Submit</button>
             </form>
-            <div id="add-game-result"></div> <!-- To display the result of adding a game -->
+            <div id="add-game-result"></div>
+            <!-- New Section for Adding Game via Gamecode -->
+            <div id="add-game-via-code">
+                <h3>Add Game via Gamecode</h3>
+                <input type="text" id="gamecode-input" placeholder="Enter Game Code">
+                <button onclick="submitGameCode()">Add Game via Gamecode</button>
+                <div id="add-gamecode-result"></div>
+            </div>
+
         </div>        
         
         <div id="statistics" class="content">
@@ -174,6 +183,46 @@
                 document.getElementById("add-game-result").innerHTML = "Game added successfully!";
             } else {
                 document.getElementById("add-game-result").innerHTML = "Failed to add the game.";
+            }
+        }
+
+        // Function to handle adding a game via gamecode
+        async function submitGameCode() {
+            const gameCode = document.getElementById("gamecode-input").value;
+
+            if (!gameCode) {
+                alert("Please enter a game code.");
+                return;
+            }
+
+            // Prepare the request body
+            const requestBody = {
+                gamecode: gameCode
+            };
+
+            console.log("Sending request body:", requestBody); // Debugging: Log the request body
+
+            try {
+                // Send the POST request
+                const response = await fetchWithAuth("/api/games", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(requestBody)
+                });
+
+                console.log("Response status:", response.status); // Debugging: Log the response status
+
+                // Handle the response
+                if (response && response.ok) {
+                    document.getElementById("add-gamecode-result").innerHTML = "Game added successfully via game code!";
+                } else {
+                    document.getElementById("add-gamecode-result").innerHTML = "Failed to add the game via game code. Status: " + response.status;
+                }
+            } catch (error) {
+                console.error("Error submitting game code:", error); // Debugging: Log any errors
+                document.getElementById("add-gamecode-result").innerHTML = "An error occurred while submitting the game code.";
             }
         }
 
@@ -268,10 +317,31 @@
                 winConditionCell.textContent = game.WinCondition;
                 row.appendChild(winConditionCell);
 
+                // Add Sharecode with a clickable blue box
+                const sharecodeCell = document.createElement("td");
+                const sharecodeBox = document.createElement("div");
+                sharecodeBox.classList.add("sharecode-box");
+                sharecodeBox.textContent = "📋"; // Clipboard icon or any text you prefer
+                sharecodeBox.title = "Click to copy Sharecode";
+                sharecodeBox.addEventListener("click", () => copyToClipboard(game.Sharekey));
+                sharecodeCell.appendChild(sharecodeBox);
+                row.appendChild(sharecodeCell);
+
                 gamesTableBody.appendChild(row);
             });
-        }        
-        // Function to fetch and display statistics
+        }
+
+        // Function to copy text to clipboard
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text)
+                .then(() => {
+                    alert("Sharecode copied to clipboard: " + text);
+                })
+                .catch(() => {
+                    alert("Failed to copy Sharecode to clipboard.");
+                });
+        }        // Function to fetch and display statistics
+
         async function loadStats() {
             const response = await fetchWithAuth("/api/statistics");
             if (response && response.ok) {
@@ -308,9 +378,17 @@
 
         // Run authentication check on page load
         document.addEventListener("DOMContentLoaded", () => {
-            checkAuth();
             showContent('list-games');
         });
+
+        // Function to open the game code popup
+        function openGameCodePopup() {
+            const modal = document.getElementById("gamecode-modal");
+            modal.style.display = "block";
+        }
+
     </script>
+
+
 </body>
 </html>

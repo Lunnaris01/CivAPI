@@ -23,15 +23,17 @@ import (
 type User struct {
 	ID             int
 	Username       string
+	DisplayName    string
 	HashedPassword string
+	IsContributer  bool
+	FriendsCode    string
 	CreatedAt      time.Time
 	UpdatedAt      time.Time
-	IsContributer  bool
 }
 
 func (q *Queries) AddUser(ctx context.Context, username, display_name, friendscode, hashedPassword string) error {
 	// Define the query string
-	queryString := "INSERT INTO users (username, display_name, friendscode, hashed_password) VALUES (?, ?)"
+	queryString := "INSERT INTO users (username, display_name, friendscode, hashed_password) VALUES (?, ?, ?, ?)"
 
 	stmt, err := q.PrepareContext(ctx, queryString)
 	if err != nil {
@@ -59,7 +61,7 @@ func (q *Queries) GetUserByUsername(ctx context.Context, username string) (User,
 	defer stmt.Close() // Ensure the statement is closed after use
 	// Execute the statement with the provided parameters
 	var user User
-	err = stmt.QueryRowContext(ctx, username).Scan(&user.ID, &user.Username, &user.HashedPassword, &user.CreatedAt, &user.UpdatedAt, &user.IsContributer)
+	err = stmt.QueryRowContext(ctx, username).Scan(&user.ID, &user.Username, &user.DisplayName, &user.HashedPassword, &user.IsContributer, &user.FriendsCode, &user.CreatedAt, &user.UpdatedAt)
 	if err != nil {
 		return User{}, fmt.Errorf("failed to fetch User from Database: %w", err)
 	}
